@@ -21,6 +21,9 @@ block_size = 24
 
 window = pygame.display.set_mode((FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT))
 
+pygame.mixer.music.load('assets/sounds/Seven Goblins - A2.mp3')
+pygame.mixer.music.play(-1)
+
 level_0 = {
     'terrain': 'levels/0/level_0_terrain.csv',
     'coins': 'levels/0/level_0_coins.csv',
