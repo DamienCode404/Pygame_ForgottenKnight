@@ -1,4 +1,6 @@
 import os
+from os import walk
+from csv import reader
 import random
 import math
 import pygame
@@ -6,16 +8,25 @@ from os import listdir
 from os.path import isfile, join
 pygame.init()
 
-pygame.display.set_caption("Platformer")
+pygame.display.set_caption("Forgotten Knight")
 
 info = pygame.display.Info()
 FULLSCREEN_WIDTH = info.current_w
 FULLSCREEN_HEIGHT = info.current_h
 
 FPS = 60
-PLAYER_VEL = 5
+PLAYER_VEL = 8
+
+block_size = 24
 
 window = pygame.display.set_mode((FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT))
+
+level_0 = {
+    'terrain': 'levels/0/level_0_terrain.csv',
+    'coins': 'levels/0/level_0_coins.csv',
+    'lamp': 'levels/0/level_0_lamp.csv',
+    'player': 'levels/0/level_0_player.csv',
+    'shop': 'levels/0/level_0_shop.csv'}
 
 def flip(sprites):
     return [pygame.transform.flip(sprite, True, False) for sprite in sprites]
@@ -34,7 +45,7 @@ def load_sprite_sheets(dir1, width, height, direction=False):
             surface = pygame.Surface((width, height), pygame.SRCALPHA, 32)
             rect = pygame.Rect(i * width, 0, width, height)
             surface.blit(sprite_sheet, (0, 0), rect)
-            sprites.append(pygame.transform.scale2x(surface))
+            sprites.append(pygame.transform.scale(surface, (450, 300))) # Resize character in game
             
         if direction:
             all_sprites[image.replace(".png", "") + "_right"] = sprites
@@ -44,13 +55,103 @@ def load_sprite_sheets(dir1, width, height, direction=False):
     return all_sprites
 
 
+def import_folder(path):
+    for information in walk(path):
+        print(information)
+
+def import_csv_layout(path):
+    terrain_map = []
+    with open(path) as map:
+        level = reader(map, delimiter=',')
+        for row in level:
+            terrain_map.append(list(row))
+        return terrain_map
+    
+def import_cut_graphics(path):
+    surface = pygame.image.load(path).convert_alpha()
+    tile_num_x = int(surface.get_size()[0] / block_size)
+    tile_num_y = int(surface.get_size()[1] / block_size)
+
+    cut_tiles = []
+    for row in range(tile_num_y):
+        for col in range(tile_num_x):
+            x = col * block_size
+            y = row * block_size
+            new_surf = pygame.Surface((block_size, block_size))
+            new_surf.blit(surface, (0, 0), pygame.Rect(x,y,block_size, block_size))
+            cut_tiles.append(new_surf)
+            
+    return cut_tiles
+
+class Tile(pygame.sprite.Sprite):
+    def __init__(self, size, x, y):
+        super().__init__()
+        self.image = pygame.Surface((size, size))
+        self.image.fill('grey')
+        self.rect = self.image.get_rect(topleft = (x, y))
+        
+    def update(self, shift):
+        self.rect.x += shift
+
+class StaticTile(Tile):
+    def __init__(self, size, x, y, surface):
+        super().__init__(size, x, y)
+        self.image = surface
+
+class Level:
+    def __init__(self, level_data, surface):
+        # general setup
+        self.display_surface = surface
+        self.world_shift = 0
+        
+        # terrain 
+        terrain_layout = import_csv_layout(level_data['terrain'])
+        self.terrain_sprites = self.create_tile_group(terrain_layout, 'terrain')
+        
+        # coins
+        # coins_layout = import_csv_layout(level_data['coins'])
+        # self.coins_sprites = self.create_tile_group(coins_layout, 'coins')        
+            
+            
+    def create_tile_group(self, layout, type):
+        sprite_group = pygame.sprite.Group()
+
+        for row_index, row in enumerate(layout):
+            for col_index, val in enumerate(row):
+                if val != '-1':
+                    x = col_index * block_size
+                    y = row_index * block_size
+
+                    if type == 'terrain':
+                        terrain_tile_list = import_cut_graphics('assets/terrain/oak_woods_tileset.png')
+                        tile_surface = terrain_tile_list[int(val)]
+                        sprite = StaticTile(block_size, x, y, tile_surface)
+                        
+                    # if type == 'coins':
+                    #     coins_tile_list = import_cut_graphics('assets/coins/MonedaD.png')
+                    #     tile_surface = coins_tile_list[int(val)]
+                    #     sprite = StaticTile(tile_size, x, y, tile_surface)
+                        
+                    sprite_group.add(sprite)
+
+        return sprite_group
+                                            
+    def run(self):
+        # terrain
+        self.terrain_sprites.draw(self.display_surface)
+        self.terrain_sprites.update(self.world_shift)
+        
+        # lamp
+        # self.coins_sprites.draw(self.display_surface)
+        # self.coins_sprites.update(self.world_shift)
+
 def get_block(size):
     path = join("assets", "terrain", "oak_woods_tileset.png")
     image = pygame.image.load(path).convert_alpha()
     surface = pygame.Surface((size, size), pygame.SRCALPHA, 32)
-    rect = pygame.Rect(96, 0, size, size)
+    rect = pygame.Rect(24, 0, size, size)
     surface.blit(image, (0, 0), rect)
-    return pygame.transform.scale2x(surface)
+    return pygame.transform.scale(surface, (250, 80))
 
 
 class Player(pygame.sprite.Sprite):
@@ -135,6 +236,8 @@ class Player(pygame.sprite.Sprite):
         elif self.y_vel < 0:
             if self.jump_count == 1:
                 sprite_sheet = "_Jump"
+            else:
+                sprite_sheet = "_Roll" # Faire en sorte que l'animation se termine avant "_Fall"
         elif self.y_vel > self.GRAVITY * 2:
             sprite_sheet = "_Fall"
         elif self.x_vel != 0:
@@ -245,27 +348,30 @@ def handle_move(player, objects):
         if obj and obj.name == "fire":
             player.make_hit()
 
+
+level = Level(level_0, window)
+
 def main(window):
     clock = pygame.time.Clock()
     
     bg_image = pygame.image.load(join("assets", "img", "Background.png")).convert_alpha()
     bg_image = pygame.transform.scale(bg_image, (FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT))
-
-    block_size = 96
-
+    
+    # Create the player instance
     player = Player(100, 100, 50, 50)
+    
+    # Create the floor blocks (terrain)
     floor = [Block(i * block_size, FULLSCREEN_HEIGHT - block_size, block_size)
              for i in range(-FULLSCREEN_WIDTH // block_size, (FULLSCREEN_WIDTH * 2) // block_size)]
-    objects = [*floor, Block(0, FULLSCREEN_HEIGHT - block_size * 2, block_size),
-               Block(block_size * 3, FULLSCREEN_HEIGHT - block_size * 4, block_size)]
+    
+    # Additional blocks
+    objects = [*floor]
 
     offset_x = 0
     scroll_area_width = 200
 
     run = True
     while run:
-        clock.tick(FPS)
-        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -282,6 +388,9 @@ def main(window):
         player.loop(FPS)
         handle_move(player, objects)
         draw(window, bg_image, player, objects, offset_x)
+        level.run()
+        # pygame.display.update()
+        clock.tick(FPS)
 
         if ((player.rect.right - offset_x >= FULLSCREEN_WIDTH - scroll_area_width) and player.x_vel > 0) or (
                 (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
