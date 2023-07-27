@@ -100,8 +100,12 @@ class StaticTile(Tile):
     def __init__(self, size, x, y, surface, name = None):
         super().__init__(size, x, y)
         self.image = surface
+        self.image.set_colorkey((0,0,0))
         self.name = name
 
+    def update(self, shift):
+        self.rect.x += shift
+        
 class Level:
     def __init__(self, level_data, surface):
         # general setup
@@ -110,26 +114,29 @@ class Level:
         
         # terrain 
         terrain_layout = import_csv_layout(level_data['terrain'])
-        self.terrain_sprites = self.create_tile_group(terrain_layout, 'terrain')
+        self.terrain_sprites = self.create_tile_group(terrain_layout, 'terrain', 3)
         
         # coins
         # coins_layout = import_csv_layout(level_data['coins'])
         # self.coins_sprites = self.create_tile_group(coins_layout, 'coins')        
             
             
-    def create_tile_group(self, layout, type):
+    def create_tile_group(self, layout, type, resize = 1):
         sprite_group = pygame.sprite.Group()
+        resize_offset_y = FULLSCREEN_HEIGHT - (block_size * resize * len(layout))
+        print(resize_offset_y)
 
         for row_index, row in enumerate(layout):
             for col_index, val in enumerate(row):
                 if val != '-1':
-                    x = col_index * block_size
-                    y = row_index * block_size
+                    x = col_index * block_size * resize
+                    y = resize_offset_y + (row_index * block_size * resize)
 
                     if type == 'terrain':
                         terrain_tile_list = import_cut_graphics('assets/terrain/oak_woods_tileset.png')
                         tile_surface = terrain_tile_list[int(val)]
-                        sprite = StaticTile(block_size, x, y, tile_surface)
+                        tile_surface = pygame.transform.scale(tile_surface, (block_size*resize, block_size*resize))                        
+                        sprite = StaticTile(block_size, x, y, tile_surface, 'terrain')
                         
                     # if type == 'coins':
                     #     coins_tile_list = import_cut_graphics('assets/coins/MonedaD.png')
@@ -140,16 +147,17 @@ class Level:
 
         return sprite_group
                                             
-    def run(self):
+    def run(self, offset_x):
         # terrain
+        x_shift = self.world_shift - offset_x
+        self.world_shift = offset_x
+
+        self.terrain_sprites.update(x_shift)
         self.terrain_sprites.draw(self.display_surface)
-        self.terrain_sprites.update(self.world_shift)
         
         # lamp
         # self.coins_sprites.draw(self.display_surface)
         # self.coins_sprites.update(self.world_shift)
-
-level = Level(level_0, window)
 
 def get_block(size):
     path = join("assets", "terrain", "oak_woods_tileset.png")
@@ -298,7 +306,11 @@ def draw(window, bg_image, player, objects, offset_x):
     window.blit(bg_image, (0, 0))
 
     for obj in objects:
-        obj.draw(window, offset_x)
+        if type(obj) == Block:
+            if obj.rect.x - offset_x < FULLSCREEN_WIDTH and obj.rect.x - offset_x > -obj.width:
+                obj.draw(window, offset_x)
+
+    level.run(offset_x)
 
     player.draw(window, offset_x)
 
@@ -557,6 +569,8 @@ def select_level():
 
 in_game = False
 
+level = Level(level_0, window)
+
 def game(window):
     clock = pygame.time.Clock()
     
@@ -571,7 +585,7 @@ def game(window):
              for i in range(-FULLSCREEN_WIDTH // block_size, (FULLSCREEN_WIDTH * 2) // block_size)]
     
     # Additional blocks
-    objects = [*floor]
+    objects = [*floor, *level.terrain_sprites]
     
     global in_game  
     in_game = True
@@ -602,8 +616,6 @@ def game(window):
         player.loop(FPS)
         handle_move(player, objects)
         draw(window, bg_image, player, objects, offset_x)
-        pygame.display.update()
-        level.run()
         clock.tick(FPS)
 
         if ((player.rect.right - offset_x >= FULLSCREEN_WIDTH - scroll_area_width) and player.x_vel > 0) or (
