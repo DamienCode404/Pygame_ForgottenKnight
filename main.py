@@ -11,7 +11,7 @@ from os.path import isfile, join
 pygame.init()
 
 pygame.display.set_caption("Forgotten Knight")
-# pygame.display.set_icon(pygame.load.image("assets/"))
+pygame.display.set_icon(pygame.image.load("assets/logo/icon.png"))
 
 info = pygame.display.Info()
 FULLSCREEN_WIDTH = info.current_w
@@ -456,7 +456,7 @@ def pause():
         OPTIONS_RESUME = Button(image=None, pos=((FULLSCREEN_WIDTH/2), 1100), 
                             text_input="RESUME", font=get_font(90), base_color="#d7fcd4", hovering_color="White")
 
-        for button in [OPTIONS_FULLSCREEN, OPTIONS_SOUND, OPTIONS_RESUME]:
+        for button in [OPTIONS_FULLSCREEN, OPTIONS_MENU, OPTIONS_SOUND, OPTIONS_RESUME]:
             button.changeColor(OPTIONS_MOUSE_POS)
             button.update(window)
 
