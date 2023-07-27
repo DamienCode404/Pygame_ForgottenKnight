@@ -1,306 +1,20 @@
-import sys
-import os
-from os import walk
-from csv import reader
-import random
-import math
 import pygame
-from os import listdir
-from os.path import isfile, join
+import sys
 
 pygame.init()
 
 pygame.display.set_caption("Forgotten Knight")
 pygame.display.set_icon(pygame.image.load("assets/logo/icon.png"))
 
-info = pygame.display.Info()
-FULLSCREEN_WIDTH = info.current_w
-FULLSCREEN_HEIGHT = info.current_h
+from scripts.parameters import *
 
-FPS = 60
-PLAYER_VEL = 10
+from scripts.levels import *
 
-block_size = 24
+from scripts.load_animations import *
 
-window = pygame.display.set_mode((FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT))
+from scripts.importation import *
 
-level_0 = {
-    'terrain': 'levels/0/level_0_terrain.csv',
-    'coins': 'levels/0/level_0_coins.csv',
-    'lamp': 'levels/0/level_0_lamp.csv',
-    'player': 'levels/0/level_0_player.csv',
-    'shop': 'levels/0/level_0_shop.csv'}
-
-def flip(sprites):
-    return [pygame.transform.flip(sprite, True, False) for sprite in sprites]
-
-def load_sprite_sheets(dir1, width, height, direction=False):
-    path = join("assets", dir1)
-    images = [f for f in listdir(path) if isfile(join(path, f))]
-
-    all_sprites = {}
-
-    for image in images:
-        sprite_sheet = pygame.image.load(join(path, image)).convert_alpha()
-
-        sprites = []
-        for i in range(sprite_sheet.get_width() // width):
-            surface = pygame.Surface((width, height), pygame.SRCALPHA, 32)
-            rect = pygame.Rect(i * width, 0, width, height)
-            surface.blit(sprite_sheet, (0, 0), rect)
-            sprites.append(pygame.transform.scale(surface, (450, 300))) # Resize character in game
-            
-        if direction:
-            all_sprites[image.replace(".png", "") + "_right"] = sprites
-            all_sprites[image.replace(".png", "") + "_left"] = flip(sprites)
-        else:
-            all_sprites[image.replace(".png", "")] = sprites
-    return all_sprites
-
-
-def import_folder(path):
-    for information in walk(path):
-        print(information)
-
-def import_csv_layout(path):
-    terrain_map = []
-    with open(path) as map:
-        level = reader(map, delimiter=',')
-        for row in level:
-            terrain_map.append(list(row))
-        return terrain_map
-    
-def import_cut_graphics(path):
-    surface = pygame.image.load(path).convert_alpha()
-    tile_num_x = int(surface.get_size()[0] / block_size)
-    tile_num_y = int(surface.get_size()[1] / block_size)
-
-    cut_tiles = []
-    for row in range(tile_num_y):
-        for col in range(tile_num_x):
-            x = col * block_size
-            y = row * block_size
-            new_surf = pygame.Surface((block_size, block_size))
-            new_surf.blit(surface, (0, 0), pygame.Rect(x,y,block_size, block_size))
-            cut_tiles.append(new_surf)
-            
-    return cut_tiles
-
-class Tile(pygame.sprite.Sprite):
-    def __init__(self, size, x, y):
-        super().__init__()
-        self.image = pygame.Surface((size, size))
-        self.image.fill('grey')
-        self.rect = self.image.get_rect(topleft = (x, y))
-        
-    def update(self, shift):
-        self.rect.x += shift
-
-class StaticTile(Tile):
-    def __init__(self, size, x, y, surface, name = None):
-        super().__init__(size, x, y)
-        self.image = surface
-        self.image.set_colorkey((0,0,0))
-        self.name = name
-
-    def update(self, shift):
-        self.rect.x += shift
-        
-class Level:
-    def __init__(self, level_data, surface):
-        # general setup
-        self.display_surface = surface
-        self.world_shift = 0
-        
-        # terrain 
-        terrain_layout = import_csv_layout(level_data['terrain'])
-        self.terrain_sprites = self.create_tile_group(terrain_layout, 'terrain', 3)
-        
-        # coins
-        # coins_layout = import_csv_layout(level_data['coins'])
-        # self.coins_sprites = self.create_tile_group(coins_layout, 'coins')        
-            
-            
-    def create_tile_group(self, layout, type, resize = 1):
-        sprite_group = pygame.sprite.Group()
-        resize_offset_y = FULLSCREEN_HEIGHT - (block_size * resize * len(layout))
-        print(resize_offset_y)
-
-        for row_index, row in enumerate(layout):
-            for col_index, val in enumerate(row):
-                if val != '-1':
-                    x = col_index * block_size * resize
-                    y = resize_offset_y + (row_index * block_size * resize)
-
-                    if type == 'terrain':
-                        terrain_tile_list = import_cut_graphics('assets/terrain/oak_woods_tileset.png')
-                        tile_surface = terrain_tile_list[int(val)]
-                        tile_surface = pygame.transform.scale(tile_surface, (block_size*resize, block_size*resize))                        
-                        sprite = StaticTile(block_size, x, y, tile_surface, 'terrain')
-                        
-                    # if type == 'coins':
-                    #     coins_tile_list = import_cut_graphics('assets/coins/MonedaD.png')
-                    #     tile_surface = coins_tile_list[int(val)]
-                    #     sprite = StaticTile(tile_size, x, y, tile_surface)
-                        
-                    sprite_group.add(sprite)
-
-        return sprite_group
-                                            
-    def run(self, offset_x):
-        # terrain
-        x_shift = self.world_shift - offset_x
-        self.world_shift = offset_x
-
-        self.terrain_sprites.update(x_shift)
-        self.terrain_sprites.draw(self.display_surface)
-        
-        # lamp
-        # self.coins_sprites.draw(self.display_surface)
-        # self.coins_sprites.update(self.world_shift)
-
-def get_block(size):
-    path = join("assets", "terrain", "oak_woods_tileset.png")
-    image = pygame.image.load(path).convert_alpha()
-    surface = pygame.Surface((size, size), pygame.SRCALPHA, 32)
-    rect = pygame.Rect(24, 0, size, size)
-    surface.blit(image, (0, 0), rect)
-    return pygame.transform.scale(surface, (250, 80))
-
-
-class Player(pygame.sprite.Sprite):
-    # Redimensionner le personnage in game
-    COLOR = (255, 0, 0)
-    GRAVITY = 1
-    SPRITES = load_sprite_sheets("animation", 120, 80, True)
-    ANIMATION_DELAY = 3
-
-    def __init__(self, x, y, width, height):
-        super().__init__()
-        self.rect = pygame.Rect(x, y, width, height)
-        self.x_vel = 0
-        self.y_vel = 0
-        self.mask = None
-        self.direction = "left"
-        self.animation_count = 0
-        self.fall_count = 0
-        self.jump_count = 0
-        self.hit = False
-        self.hit_count = 0
-        self.attack = False
-        self.attack_count = 0
-
-    def jump(self):
-        self.y_vel = -self.GRAVITY * 8
-        self.animation_count = 0
-        self.jump_count += 1
-        self.fall_count = 0
-
-    def move(self, dx, dy):
-        self.rect.x += dx
-        self.rect.y += dy
-
-    def attacking(self):
-        self.attack = True
-        self.attack_count += 1
-        self.animation_count = 0
-    
-    def make_hit(self):
-        self.hit = True
-
-    def move_left(self, vel):
-        self.x_vel = -vel
-        if self.direction != "left":
-            self.direction = "left"
-            self.animation_count = 0
-
-    def move_right(self, vel):
-        self.x_vel = vel
-        if self.direction != "right":
-            self.direction = "right"
-            self.animation_count = 0
-
-    def loop(self, fps):
-        self.y_vel += min(1, (self.fall_count / fps) * self.GRAVITY)
-        self.move(self.x_vel, self.y_vel)
-
-        if self.hit:
-            self.hit_count += 1
-        if self.hit_count > fps * 2:
-            self.hit = False
-            self.hit_count = 0
-
-        self.fall_count += 1
-        self.update_sprite()
-
-    def landed(self):
-        self.fall_count = 0
-        self.y_vel = 0
-        self.jump_count = 0
-
-    def hit_head(self):
-        self.count = 0
-        self.y_vel *= -1
-
-    def update_sprite(self):
-        sprite_sheet = "_Idle"
-        if self.hit:
-            sprite_sheet = "_Hit"
-        elif self.y_vel < 0:
-            if self.jump_count == 1:
-                sprite_sheet = "_Jump"
-            else:
-                sprite_sheet = "_Roll" # Faire en sorte que l'animation se termine avant "_Fall"
-        elif self.y_vel > self.GRAVITY * 2:
-            sprite_sheet = "_Fall"
-        elif self.x_vel != 0:
-            sprite_sheet = "_Run"
-        elif self.attack:
-            if self.attack_count % 2 == 0:
-                sprite_sheet = "_Attack"
-            else:
-                sprite_sheet = "_Attack2"
-
-        sprite_sheet_name = sprite_sheet + "_" + self.direction
-        sprites = self.SPRITES[sprite_sheet_name]
-        sprite_index = (self.animation_count // self.ANIMATION_DELAY) % len(sprites)
-        self.sprite = sprites[sprite_index]
-        self.animation_count += 1
-
-        if sprite_sheet == "_Attack" and sprite_index == len(sprites) - 1:
-            self.attack = False
-        elif sprite_sheet == "_Attack2" and sprite_index == len(sprites) - 1:
-            self.attack = False
-            self.update()
-
-    def update(self):
-        self.rect = self.sprite.get_rect(topleft=(self.rect.x, self.rect.y))
-        self.mask = pygame.mask.from_surface(self.sprite)
-
-    def draw(self, win, offset_x):
-        win.blit(self.sprite, (self.rect.x - offset_x, self.rect.y))
-
-
-class Object(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height, name=None):
-        super().__init__()
-        self.rect = pygame.Rect(x, y, width, height)
-        self.image = pygame.Surface((width, height), pygame.SRCALPHA)
-        self.width = width
-        self.height = height
-        self.name = name
-
-    def draw(self, win, offset_x):
-        win.blit(self.image, (self.rect.x - offset_x, self.rect.y))
-
-
-class Block(Object):
-    def __init__(self, x, y, size):
-        super().__init__(x, y, size, size)
-        block = get_block(size)
-        self.image.blit(block, (0, 0))
-        self.mask = pygame.mask.from_surface(self.image)
-
+from scripts.player import Player
 
 def draw(window, bg_image, player, objects, offset_x, bg_images):
     window.blit(bg_image, (0, 0))
@@ -401,9 +115,6 @@ class Button():
 def get_font(size):
     font_path = "assets/font.ttf"
     return pygame.font.Font(font_path, size)
-
-BG = pygame.image.load(join("assets", "menu", "Background.png")).convert_alpha()
-BG = pygame.transform.scale(BG, (FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT))
 
 def sound_off():
     pygame.mixer.music.stop()
@@ -569,7 +280,43 @@ def select_level():
                 
         pygame.display.update()
 
-in_game = False
+
+class Button():
+	def __init__(self, image, pos, text_input, font, base_color, hovering_color):
+		self.image = image
+		self.x_pos = pos[0]
+		self.y_pos = pos[1]
+		self.font = font
+		self.base_color, self.hovering_color = base_color, hovering_color
+		self.text_input = text_input
+		self.text = self.font.render(self.text_input, True, self.base_color)
+		if self.image is None:
+			self.image = self.text
+		self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
+		self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
+
+	def update(self, window):
+		if self.image is not None:
+			window.blit(self.image, self.rect)
+		window.blit(self.text, self.text_rect)
+
+	def checkForInput(self, position):
+		if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+			return True
+		return False
+
+	def changeColor(self, position):
+		if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+			self.text = self.font.render(self.text_input, True, self.hovering_color)
+		else:
+			self.text = self.font.render(self.text_input, True, self.base_color)
+
+
+def get_font(size):
+    font_path = "assets/font.ttf"
+    return pygame.font.Font(font_path, size)
+
+
 
 level = Level(level_0, window)
 
@@ -649,7 +396,7 @@ def game(window):
 
 if __name__ == "__game__":
     game(window)
-
+    
 def main_menu():
     while True:
         window.blit(BG, (0, 0))
