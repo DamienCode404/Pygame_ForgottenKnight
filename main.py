@@ -18,7 +18,7 @@ FULLSCREEN_WIDTH = info.current_w
 FULLSCREEN_HEIGHT = info.current_h
 
 FPS = 60
-PLAYER_VEL = 8
+PLAYER_VEL = 10
 
 block_size = 24
 
@@ -302,8 +302,10 @@ class Block(Object):
         self.mask = pygame.mask.from_surface(self.image)
 
 
-def draw(window, bg_image, player, objects, offset_x):
+def draw(window, bg_image, player, objects, offset_x, bg_images):
     window.blit(bg_image, (0, 0))
+
+    background_paralax_draw(bg_images, offset_x)
 
     for obj in objects:
         if type(obj) == Block:
@@ -571,11 +573,30 @@ in_game = False
 
 level = Level(level_0, window)
 
-def game(window):
-    clock = pygame.time.Clock()
-    
+
+def background_paralax():
+    bg_images = []
+    for i in range(1,4):
+        bg_image = pygame.image.load(join("assets", "img", f"background_layer_{i}.png")).convert_alpha()
+        bg_images.append(pygame.transform.scale(bg_image, (FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT)))
+    return bg_images
+
+def background_paralax_draw(bg_images, offset_x):
+    bg_width = bg_images[0].get_width()
+
+    for i in range(len(bg_images)):
+        for n in range(-1, 2):
+            window.blit(bg_images[i], (-(offset_x *(i/10+0.25)) % bg_width + n * bg_width, 0))
+
+def background():
     bg_image = pygame.image.load(join("assets", "img", "Background.png")).convert_alpha()
     bg_image = pygame.transform.scale(bg_image, (FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT))
+    return bg_image
+
+def game(window):
+    clock = pygame.time.Clock()
+    bg_images = background_paralax()
+    bg_image = bg_images[0]
     
     # Create the player instance
     player = Player(100, 100, 50, 50)
@@ -615,7 +636,7 @@ def game(window):
 
         player.loop(FPS)
         handle_move(player, objects)
-        draw(window, bg_image, player, objects, offset_x)
+        draw(window, bg_image, player, objects, offset_x, bg_images)
         clock.tick(FPS)
 
         if ((player.rect.right - offset_x >= FULLSCREEN_WIDTH - scroll_area_width) and player.x_vel > 0) or (
