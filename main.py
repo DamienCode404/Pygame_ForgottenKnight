@@ -468,12 +468,12 @@ def pause():
                 if OPTIONS_FULLSCREEN.checkForInput(OPTIONS_MOUSE_POS):
                     option_fullscreen()
                 if OPTIONS_MENU.checkForInput(OPTIONS_MOUSE_POS):
-                    return
+                    return True
                 if OPTIONS_SOUND.checkForInput(OPTIONS_MOUSE_POS):
                     sound_options()
                 if OPTIONS_RESUME.checkForInput(OPTIONS_MOUSE_POS):
                     if in_game:
-                        return
+                        return False
                     else :
                         select_level()
                 
@@ -588,7 +588,9 @@ def game(window):
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    pause()
+                    return_to_menu = pause()
+                    if return_to_menu:
+                        return
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and player.jump_count < 2:
                     player.jump()
