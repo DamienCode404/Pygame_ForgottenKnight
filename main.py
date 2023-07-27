@@ -429,7 +429,7 @@ def sound_options():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
-                    options()
+                    return
                 if SOUND_ON.checkForInput(OPTIONS_MOUSE_POS):
                     sound_on()
                 if SOUND_OFF.checkForInput(OPTIONS_MOUSE_POS):
@@ -468,7 +468,7 @@ def pause():
                 if OPTIONS_FULLSCREEN.checkForInput(OPTIONS_MOUSE_POS):
                     option_fullscreen()
                 if OPTIONS_MENU.checkForInput(OPTIONS_MOUSE_POS):
-                    main_menu()
+                    return
                 if OPTIONS_SOUND.checkForInput(OPTIONS_MOUSE_POS):
                     sound_options()
                 if OPTIONS_RESUME.checkForInput(OPTIONS_MOUSE_POS):
@@ -545,13 +545,13 @@ def select_level():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if LEVEL_1.checkForInput(OPTIONS_MOUSE_POS):
-                    game(window)
+                    return 1
                 if LEVEL_2.checkForInput(OPTIONS_MOUSE_POS):
-                    game(window)
+                    return 2
                 if LEVEL_3.checkForInput(OPTIONS_MOUSE_POS):
-                    game(window)
+                    return 3
                 if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
-                    main_menu()
+                    return None
                 
         pygame.display.update()
 
@@ -644,7 +644,10 @@ def main_menu():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    select_level()
+                    level_number = select_level()
+                    if level_number is not None:
+                        #mettre le level en question
+                        game(window)                    
                 if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                     options()
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
