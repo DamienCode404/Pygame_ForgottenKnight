@@ -11,6 +11,7 @@ from os.path import isfile, join
 pygame.init()
 
 pygame.display.set_caption("Forgotten Knight")
+# pygame.display.set_icon(pygame.load.image("assets/"))
 
 info = pygame.display.Info()
 FULLSCREEN_WIDTH = info.current_w
@@ -96,9 +97,10 @@ class Tile(pygame.sprite.Sprite):
         self.rect.x += shift
 
 class StaticTile(Tile):
-    def __init__(self, size, x, y, surface):
+    def __init__(self, size, x, y, surface, name = None):
         super().__init__(size, x, y)
         self.image = surface
+        self.name = name
 
 class Level:
     def __init__(self, level_data, surface):
@@ -184,8 +186,7 @@ class Player(pygame.sprite.Sprite):
         self.y_vel = -self.GRAVITY * 8
         self.animation_count = 0
         self.jump_count += 1
-        if self.jump_count == 1:
-            self.fall_count = 0
+        self.fall_count = 0
 
     def move(self, dx, dy):
         self.rect.x += dx
@@ -436,6 +437,48 @@ def sound_options():
                 
         pygame.display.update()
 
+def pause():
+    while True:
+        OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
+
+        window.blit(BG, (0, 0))
+
+        OPTIONS_TEXT = get_font(100).render("PAUSE", True, "White")
+        OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=((FULLSCREEN_WIDTH/2), 260))
+        window.blit(OPTIONS_TEXT, OPTIONS_RECT)
+        
+        OPTIONS_FULLSCREEN = Button(image=None, pos=((FULLSCREEN_WIDTH/2), 500), 
+                            text_input="FULLSCREEN", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+        OPTIONS_MENU = Button(image=None, pos=((FULLSCREEN_WIDTH/2), 700), 
+                            text_input="MENU", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+        OPTIONS_SOUND = Button(image=None, pos=((FULLSCREEN_WIDTH/2), 900), 
+                            text_input="SOUND", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+        OPTIONS_RESUME = Button(image=None, pos=((FULLSCREEN_WIDTH/2), 1100), 
+                            text_input="RESUME", font=get_font(90), base_color="#d7fcd4", hovering_color="White")
+
+        for button in [OPTIONS_FULLSCREEN, OPTIONS_SOUND, OPTIONS_RESUME]:
+            button.changeColor(OPTIONS_MOUSE_POS)
+            button.update(window)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if OPTIONS_FULLSCREEN.checkForInput(OPTIONS_MOUSE_POS):
+                    option_fullscreen()
+                if OPTIONS_MENU.checkForInput(OPTIONS_MOUSE_POS):
+                    main_menu()
+                if OPTIONS_SOUND.checkForInput(OPTIONS_MOUSE_POS):
+                    sound_options()
+                if OPTIONS_RESUME.checkForInput(OPTIONS_MOUSE_POS):
+                    if in_game:
+                        return
+                    else :
+                        select_level()
+                
+        pygame.display.update()
+
 def options():
     while True:
         OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
@@ -481,7 +524,7 @@ def select_level():
         OPTIONS_TEXT = get_font(100).render("LEVELS", True, "White")
         OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=((FULLSCREEN_WIDTH/2), 260))
         window.blit(OPTIONS_TEXT, OPTIONS_RECT)
-        
+
         LEVEL_1 = Button(image=None, pos=((FULLSCREEN_WIDTH/2), 500), 
                             text_input="LEVEL 1", font=get_font(50), base_color="#d7fcd4", hovering_color="White")
         LEVEL_2 = Button(image=None, pos=((FULLSCREEN_WIDTH/2), 600), 
@@ -512,6 +555,8 @@ def select_level():
                 
         pygame.display.update()
 
+in_game = False
+
 def game(window):
     clock = pygame.time.Clock()
     
@@ -527,6 +572,9 @@ def game(window):
     
     # Additional blocks
     objects = [*floor]
+    
+    global in_game  
+    in_game = True
 
     offset_x = 0
     scroll_area_width = 200
@@ -540,7 +588,7 @@ def game(window):
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    main_menu()
+                    pause()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and player.jump_count < 2:
                     player.jump()
@@ -588,6 +636,7 @@ def main_menu():
         for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
             button.changeColor(MENU_MOUSE_POS)
             button.update(window)
+               
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
