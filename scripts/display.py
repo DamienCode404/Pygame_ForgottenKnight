@@ -22,7 +22,7 @@ def draw(window, bg_image, player, objects, offset_x, bg_images):
 
     level.run(offset_x)
 
-    player.draw(window, offset_x)
+    player.draw(window)
 
     pygame.display.update()
 
@@ -145,7 +145,7 @@ def pause():
                     if in_game:
                         return False
                     else :
-                        select_level()
+                        return True
                 
         pygame.display.update()
 

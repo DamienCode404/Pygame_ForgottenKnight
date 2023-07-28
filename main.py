@@ -41,9 +41,6 @@ def game(window):
     global in_game  
     in_game = True
 
-    offset_x = 0
-    scroll_area_width = 200
-
     run = True
     while run:
         for event in pygame.event.get():
@@ -66,12 +63,8 @@ def game(window):
 
         player.loop(FPS)
         handle_move(player, objects)
-        draw(window, bg_image, player, objects, offset_x, bg_images)
+        draw(window, bg_image, player, objects, player.offset_x, bg_images)
         clock.tick(FPS)
-
-        if ((player.rect.right - offset_x >= FULLSCREEN_WIDTH - scroll_area_width) and player.x_vel > 0) or (
-                (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
-            offset_x += player.x_vel
 
     pygame.quit()
     quit()

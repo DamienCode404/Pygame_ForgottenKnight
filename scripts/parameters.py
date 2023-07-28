@@ -15,5 +15,7 @@ in_game = False
 
 block_size = 24
 
+scroll_area_width = 200
+
 BG = pygame.image.load(join("assets", "menu", "Background.png")).convert_alpha()
 BG = pygame.transform.scale(BG, (FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT))
