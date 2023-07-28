@@ -69,9 +69,16 @@ def sound_on():
     pygame.mixer.music.play(-1)
 
 def option_fullscreen():
-    pass
+    """
+    Set the game in fullscreen or not
+    """
+    pygame.display.flip()
+
 
 def sound_options():
+    """
+    Display the sound options menu
+    """
     while True:
         OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -108,6 +115,9 @@ def sound_options():
         pygame.display.update()
 
 def pause():
+    """
+    Display the pause menu
+    """
     while True:
         OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -150,6 +160,9 @@ def pause():
         pygame.display.update()
 
 def options():
+    """
+    Display the options menu
+    """
     while True:
         OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -186,6 +199,9 @@ def options():
         pygame.display.update()
         
 def select_level():
+    """
+    Return the level number selected by the user or None if the user wants to go back to the main menu
+    """
     while True:
         OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -263,15 +279,15 @@ def get_font(size):
 
 def background_paralax():
     bg_images = []
-    for i in range(1,4):
+    for i in range(1,4): # 3 layers
         bg_image = pygame.image.load(join("assets", "img", f"background_layer_{i}.png")).convert_alpha()
         bg_images.append(pygame.transform.scale(bg_image, (FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT)))
     return bg_images
 
-def background_paralax_draw(bg_images, offset_x):
+def background_paralax_draw(bg_images, offset_x): 
     bg_width = bg_images[0].get_width()
 
-    for i in range(len(bg_images)):
+    for i in range(len(bg_images)): 
         for n in range(-1, 2):
             window.blit(bg_images[i], (-(offset_x *(i/10+0.25)) % bg_width + n * bg_width, 0))
 
