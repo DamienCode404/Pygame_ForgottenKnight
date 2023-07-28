@@ -1,7 +1,7 @@
 import pygame
 from os.path import join
 from scripts.importation import *
-from scripts.parameters import block_size, FULLSCREEN_HEIGHT
+from scripts.parameters import block_size, FULLSCREEN_HEIGHT, window
 
 level_0 = {
     'terrain': 'levels/0/level_0_terrain.csv',
@@ -62,6 +62,8 @@ class Level:
         # lamp
         # self.coins_sprites.draw(self.display_surface)
         # self.coins_sprites.update(self.world_shift)
+
+level = Level(level_0, window)
 
 def get_block(size):
     path = join("assets", "terrain", "oak_woods_tileset.png")
