@@ -18,7 +18,12 @@ from scripts.player import Player
 
 from scripts.display import *
 
+from scripts.physics import *
+
 def game(window):
+    '''
+    Main game loop
+    '''
     clock = pygame.time.Clock()
     bg_images = background_paralax()
     bg_image = bg_images[0]
