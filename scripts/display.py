@@ -152,10 +152,7 @@ def pause():
                 if OPTIONS_SOUND.checkForInput(OPTIONS_MOUSE_POS):
                     sound_options()
                 if OPTIONS_RESUME.checkForInput(OPTIONS_MOUSE_POS):
-                    if in_game:
-                        return False
-                    else :
-                        return True
+                        return
                 
         pygame.display.update()
 
