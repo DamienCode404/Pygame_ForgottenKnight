@@ -15,13 +15,16 @@ def draw(window, bg_image, player, objects, player_position, bg_images):
 
     background_paralax_draw(bg_images, player_position)
 
-    for obj in objects:
-        if type(obj) == Block:
-            if obj.rect.x - player_position < FULLSCREEN_WIDTH and obj.rect.x - player_position > -obj.width:
-                obj.draw(window, player_position)
+    ## Old code to draw the floor blocks (not used anymore)
+    ## for obj in objects:
+    ##     if type(obj) == Block:
+    ##         if obj.rect.x - player_position < FULLSCREEN_WIDTH and obj.rect.x - player_position > -obj.width:
+    ##             obj.draw(window, player_position)
 
+    # Update the terrain position and draw it
     level.run(player_position)
 
+    # Draw the player
     player.draw(window)
 
     pygame.display.update()

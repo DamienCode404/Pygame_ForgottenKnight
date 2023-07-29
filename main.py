@@ -40,26 +40,35 @@ def game(window):
 
     run = True
     while run:
+        # Check main loop events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 break
             
+            # Check for key presses
             if event.type == pygame.KEYDOWN:
+                # Check for escape key
                 if event.key == pygame.K_ESCAPE:
                     go_to_menu = pause()
                     if go_to_menu:
                         return
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and player.jump_count < 2:
+                # Check for space key (jump)
+                if event.key == pygame.K_SPACE and player.jump_count < 2 and player.jump_count > -1:
                     player.jump()
-            
+                    print(player.jump_count)
+
+            # Check for mouse clicks
             if event.type == pygame.MOUSEBUTTONDOWN:
+                # Check for left mouse button (attack)
                 if event.button == pygame.BUTTON_LEFT:
                     player.attacking()
 
+        # Update the player
         player.loop(FPS)
+        # Update the player physics
         handle_move(player, objects)
+        # Draw all the elements
         draw(window, bg_image, player, objects, player.position_x, bg_images)
         clock.tick(FPS)
 

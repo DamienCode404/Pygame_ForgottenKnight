@@ -8,7 +8,7 @@ class Player(pygame.sprite.Sprite):
     COLOR = (255, 0, 0)
     GRAVITY = 1
     SPRITES = load_sprite_sheets("animation", 120, 80, True)
-    ANIMATION_DELAY = 3
+    ANIMATION_DELAY = 2
 
     def __init__(self, x, y, width, height):
         super().__init__()
@@ -16,6 +16,7 @@ class Player(pygame.sprite.Sprite):
         self.x_vel = 0
         self.y_vel = 0
         self.mask = None
+        self.sprite_sheet = "_Idle"
         self.direction = "left"
         self.animation_count = 0
         self.fall_count = 0
@@ -25,6 +26,7 @@ class Player(pygame.sprite.Sprite):
         self.attack = False
         self.attack_count = 0
         self.position_x = 0
+        self.animation_cancelable = True
 
     def jump(self):
         self.y_vel = -self.GRAVITY * 8
@@ -34,8 +36,12 @@ class Player(pygame.sprite.Sprite):
 
     def move(self, dx, dy):
         #self.rect.x += dx
+
+        #Update the player position x value to be able to move the terrain in the opposite direction
         self.position_x += dx
         self.rect.y += dy
+
+        # Update the terrain position
         level.terrain_sprites.update(self.position_x)
 
     def attacking(self):
@@ -51,14 +57,12 @@ class Player(pygame.sprite.Sprite):
       
         if self.direction != "left":
             self.direction = "left"
-            self.animation_count = 0
 
     def move_right(self, vel):
         self.x_vel = vel
 
         if self.direction != "right":
             self.direction = "right"
-            self.animation_count = 0
 
     def loop(self, fps):
         self.y_vel += min(1, (self.fall_count / fps) * self.GRAVITY)
@@ -83,33 +87,55 @@ class Player(pygame.sprite.Sprite):
         self.y_vel *= -1
 
     def update_sprite(self):
-        sprite_sheet = "_Idle"
-        if self.hit:
-            sprite_sheet = "_Hit"
-        elif self.y_vel < 0:
-            if self.jump_count == 1:
-                sprite_sheet = "_Jump"
-            else:
-                sprite_sheet = "_Roll" # Faire en sorte que l'animation se termine avant "_Fall"
-        elif self.y_vel > self.GRAVITY * 2:
-            sprite_sheet = "_Fall"
-        elif self.x_vel != 0:
-            sprite_sheet = "_Run"
-        elif self.attack:
-            if self.attack_count % 2 == 0:
-                sprite_sheet = "_Attack"
-            else:
-                sprite_sheet = "_Attack2"
+        sprite_sheet_name = self.sprite_sheet + "_" + self.direction
+        sprites = self.SPRITES[sprite_sheet_name]
 
-        sprite_sheet_name = sprite_sheet + "_" + self.direction
+        new_sprite_sheet = self.sprite_sheet
+        new_animation_cancelable = True
+        # Boolean to check if the current sprite is the last one of the animation
+        is_last_sprite = self.animation_count // self.ANIMATION_DELAY == len(sprites)
+        if self.hit:
+            new_sprite_sheet = "_Hit"
+        elif self.jump_count != 0:
+            if self.jump_count == 1:
+                new_sprite_sheet = "_Jump"
+            else :
+                # Check if the current sprite is the last of the roll animation
+                if is_last_sprite and self.sprite_sheet == "_Roll" or self.jump_count < 0:
+                    self.jump_count = -1
+                    new_sprite_sheet = "_Fall"
+
+                else:
+                    new_sprite_sheet = "_Roll" # Faire en sorte que l'animation se termine avant "_Fall"
+                    new_animation_cancelable = False
+
+        elif self.y_vel > self.GRAVITY * 2:
+            new_sprite_sheet = "_Fall"
+        elif self.x_vel != 0:
+            new_sprite_sheet = "_Run"
+        elif self.attack:
+            new_animation_cancelable = False
+            if self.attack_count % 2 == 0:
+                new_sprite_sheet = "_Attack"
+            else:
+                new_sprite_sheet = "_Attack2"
+        else:
+            new_sprite_sheet = "_Idle"
+        
+        if new_sprite_sheet != self.sprite_sheet and (is_last_sprite or self.animation_cancelable):
+            self.animation_cancelable = new_animation_cancelable
+            self.sprite_sheet = new_sprite_sheet
+            self.animation_count = 0
+
+        sprite_sheet_name = self.sprite_sheet + "_" + self.direction
         sprites = self.SPRITES[sprite_sheet_name]
         sprite_index = (self.animation_count // self.ANIMATION_DELAY) % len(sprites)
         self.sprite = sprites[sprite_index]
         self.animation_count += 1
 
-        if sprite_sheet == "_Attack" and sprite_index == len(sprites) - 1:
+        if self.sprite_sheet == "_Attack" and sprite_index == len(sprites) - 1:
             self.attack = False
-        elif sprite_sheet == "_Attack2" and sprite_index == len(sprites) - 1:
+        elif self.sprite_sheet == "_Attack2" and sprite_index == len(sprites) - 1:
             self.attack = False
             self.update()
 
