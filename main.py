@@ -29,14 +29,11 @@ def game(window):
     bg_image = bg_images[0]
     
     # Create the player instance
-    player = Player(100, 100, 50, 50)
+    player = Player(FULLSCREEN_WIDTH*1/4, FULLSCREEN_HEIGHT*1/4, 50, 50)
     
-    # Create the floor blocks (terrain)
-    floor = [Block(i * block_size, FULLSCREEN_HEIGHT - block_size, block_size)
-             for i in range(-FULLSCREEN_WIDTH // block_size, (FULLSCREEN_WIDTH * 2) // block_size)]
     
     # Additional blocks
-    objects = [*floor, *level.terrain_sprites]
+    objects = [*level.terrain_sprites]
     
     global in_game  
     in_game = True
@@ -63,7 +60,7 @@ def game(window):
 
         player.loop(FPS)
         handle_move(player, objects)
-        draw(window, bg_image, player, objects, player.offset_x, bg_images)
+        draw(window, bg_image, player, objects, player.position_x, bg_images)
         clock.tick(FPS)
 
     pygame.quit()

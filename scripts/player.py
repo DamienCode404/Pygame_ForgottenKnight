@@ -2,7 +2,7 @@ import pygame
 
 from scripts.load_animations import load_sprite_sheets
 from scripts.parameters import FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT, block_size, scroll_area_width, FPS
-
+from scripts.levels import level
 class Player(pygame.sprite.Sprite):
     # Redimensionner le personnage in game
     COLOR = (255, 0, 0)
@@ -24,8 +24,7 @@ class Player(pygame.sprite.Sprite):
         self.hit_count = 0
         self.attack = False
         self.attack_count = 0
-        self.offset_x = 0
-        self.is_in_scroll_x_area = [False, False]
+        self.position_x = 0
 
     def jump(self):
         self.y_vel = -self.GRAVITY * 8
@@ -34,8 +33,10 @@ class Player(pygame.sprite.Sprite):
         self.fall_count = 0
 
     def move(self, dx, dy):
-        self.rect.x += dx
+        #self.rect.x += dx
+        self.position_x += dx
         self.rect.y += dy
+        level.terrain_sprites.update(self.position_x)
 
     def attacking(self):
         self.attack = True
@@ -46,28 +47,18 @@ class Player(pygame.sprite.Sprite):
         self.hit = True
 
     def move_left(self, vel):
-        print(self.is_in_scroll_x_area)
-        if not self.is_in_scroll_x_area[0]:
-            self.x_vel = vel
         self.x_vel = -vel
-        
+      
         if self.direction != "left":
             self.direction = "left"
             self.animation_count = 0
 
     def move_right(self, vel):
-        if not self.is_in_scroll_x_area[1] :
-            self.x_vel = vel
+        self.x_vel = vel
 
         if self.direction != "right":
             self.direction = "right"
             self.animation_count = 0
-
-    def scroll_x(self):
-        self.is_in_scroll_x_area = [((self.rect.left <= scroll_area_width) and self.x_vel < 0), (self.rect.right >= FULLSCREEN_WIDTH - scroll_area_width) and self.x_vel > 0]
-        if self.is_in_scroll_x_area[0] or self.is_in_scroll_x_area[1]:
-            self.offset_x += self.x_vel
-        return self.offset_x
 
     def loop(self, fps):
         self.y_vel += min(1, (self.fall_count / fps) * self.GRAVITY)

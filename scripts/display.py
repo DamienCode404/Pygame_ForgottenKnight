@@ -7,20 +7,20 @@ from scripts.parameters import BG, FULLSCREEN_HEIGHT, FULLSCREEN_WIDTH, PLAYER_V
 from scripts.levels import level
 
 
-def draw(window, bg_image, player, objects, offset_x, bg_images):
+def draw(window, bg_image, player, objects, player_position, bg_images):
     '''
     Draw all the elements on the screen
     '''
     window.blit(bg_image, (0, 0))
 
-    background_paralax_draw(bg_images, offset_x)
+    background_paralax_draw(bg_images, player_position)
 
     for obj in objects:
         if type(obj) == Block:
-            if obj.rect.x - offset_x < FULLSCREEN_WIDTH and obj.rect.x - offset_x > -obj.width:
-                obj.draw(window, offset_x)
+            if obj.rect.x - player_position < FULLSCREEN_WIDTH and obj.rect.x - player_position > -obj.width:
+                obj.draw(window, player_position)
 
-    level.run(offset_x)
+    level.run(player_position)
 
     player.draw(window)
 
@@ -72,7 +72,7 @@ def option_fullscreen():
     """
     Set the game in fullscreen or not
     """
-    pygame.display.flip()
+    pygame.display.toggle_fullscreen()
 
 
 def sound_options():

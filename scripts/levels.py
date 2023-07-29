@@ -51,12 +51,10 @@ class Level:
 
         return sprite_group
                                             
-    def run(self, offset_x):
+    def run(self, player_position):
         # terrain
-        x_shift = self.world_shift - offset_x
-        self.world_shift = offset_x
 
-        self.terrain_sprites.update(x_shift)
+        self.terrain_sprites.update(player_position)
         self.terrain_sprites.draw(self.display_surface)
         
         # lamp

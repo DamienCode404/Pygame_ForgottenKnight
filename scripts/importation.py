@@ -45,9 +45,12 @@ class Tile(pygame.sprite.Sprite):
 class StaticTile(Tile):
     def __init__(self, size, x, y, surface, name = None):
         super().__init__(size, x, y)
+        self.static_x = x
+        self.static_y = y
         self.image = surface
         self.image.set_colorkey((0,0,0))
         self.name = name
 
-    def update(self, shift):
-        self.rect.x += shift
+    def update(self, player_position_x):
+        self.rect.x = self.static_x - player_position_x
+        #self.rect.y = self.static_y - player_position_y

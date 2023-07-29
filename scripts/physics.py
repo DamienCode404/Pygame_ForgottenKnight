@@ -1,5 +1,6 @@
 import pygame
 from scripts.parameters import *
+from scripts.levels import level
 
 def handle_vertical_collision(player, objects, dy):
     
@@ -32,7 +33,6 @@ def collide(player, objects, dx):
     return collided_object
 
 def handle_move(player, objects):
-    player.scroll_x()
     keys = pygame.key.get_pressed()
 
     player.x_vel = 0
