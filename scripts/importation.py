@@ -4,9 +4,9 @@ from os import walk
 from csv import reader
 from scripts.parameters import block_size
 
-def import_folder(path):
-    for information in walk(path):
-        print(information)
+# def import_folder(path):
+#     for information in walk(path):
+#         print(information)
 
 def import_csv_layout(path):
     terrain_map = []

@@ -33,6 +33,7 @@ def collide(player, objects, dx):
     return collided_object
 
 def handle_move(player, objects):
+    # player.scroll_x()
     keys = pygame.key.get_pressed()
 
     player.x_vel = 0
