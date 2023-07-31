@@ -21,4 +21,4 @@ BG = pygame.image.load(join("assets", "menu", "Background.png")).convert_alpha()
 BG = pygame.transform.scale(BG, (FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT))
 
 BG_MAIN = pygame.image.load(join("assets", "menu", "Background_test.png")).convert_alpha()
-BG_MAIN = pygame.transform.scale(BG, (FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT))
+BG_MAIN = pygame.transform.scale(BG_MAIN, (FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT))

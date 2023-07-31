@@ -10,8 +10,8 @@ level_0 = {
     'player': 'levels/0/level_0_player.csv',
     'shop': 'levels/0/level_0_shop.csv'}
 
-# level_0 = {
-#     'terrain': 'levels/1/terrain.csv'}
+level_1 = {
+    'terrain': 'levels/1/terrain.csv'}
 
 class Level:
     def __init__(self, level_data, surface):
@@ -63,7 +63,8 @@ class Level:
         # self.coins_sprites.draw(self.display_surface)
         # self.coins_sprites.update(self.world_shift)
 
-level = Level(level_0, window)
+level_map0 = Level(level_0, window)
+level_map1 = Level(level_1, window)
 
 def get_block(size):
     path = join("assets", "terrain", "oak_woods_tileset.png")

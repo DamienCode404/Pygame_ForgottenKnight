@@ -32,7 +32,7 @@ def game(window):
     player = Player(FULLSCREEN_WIDTH/3, FULLSCREEN_HEIGHT/2, 50, 50)
     
     # Additional blocks
-    objects = [*level.terrain_sprites]
+    objects = [*level_map0.terrain_sprites]
     
     global in_game  
     in_game = True

@@ -1,6 +1,6 @@
 import pygame
 from scripts.parameters import *
-from scripts.levels import level
+from scripts.levels import level_map0, level_map1
 
 def handle_vertical_collision(player, objects, dy):
     

@@ -2,7 +2,7 @@ import pygame
 
 from scripts.load_animations import load_sprite_sheets
 from scripts.parameters import *
-from scripts.levels import level
+from scripts.levels import level_map0, level_map1
 class Player(pygame.sprite.Sprite):
     # Redimensionner le personnage in game
     COLOR = (255, 0, 0)
@@ -25,7 +25,7 @@ class Player(pygame.sprite.Sprite):
         self.hit_count = 0
         self.attack = False
         self.attack_count = 0
-        self.position_x = FULLSCREEN_HEIGHT/2 # position x tracking camera position default value
+        self.position_x = -600 # position x tracking camera position default value
         self.position_y = -300 # position y tracking camera position default value
         self.animation_cancelable = True
         self.update_sprite()
@@ -46,8 +46,12 @@ class Player(pygame.sprite.Sprite):
         self.position_y += dy
         # self.rect.x += dx
         
-        # Update the terrain position
-        level.terrain_sprites.update(self.position_x, self.position_y)
+        # Update the terrain 1 position
+        level_map0.terrain_sprites.update(self.position_x, self.position_y)
+        
+        # Update the terrain 1 position
+        level_map1.terrain_sprites.update(self.position_x, self.position_y)
+        
 
     def attacking(self):
         self.attack = True

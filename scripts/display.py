@@ -4,7 +4,7 @@ from os.path import join
 
 from scripts.levels import Block
 from scripts.parameters import BG, FULLSCREEN_HEIGHT, FULLSCREEN_WIDTH, PLAYER_VEL, in_game, window
-from scripts.levels import level
+from scripts.levels import level_map0, level_1
 
 
 def draw(window, bg_image, player, objects, player_position_x, player_position_y, bg_images):
@@ -15,14 +15,11 @@ def draw(window, bg_image, player, objects, player_position_x, player_position_y
 
     background_paralax_draw(bg_images, player_position_x)
 
-    ## Old code to draw the floor blocks (not used anymore)
-    ## for obj in objects:
-    ##     if type(obj) == Block:
-    ##         if obj.rect.x - player_position < FULLSCREEN_WIDTH and obj.rect.x - player_position > -obj.width:
-    ##             obj.draw(window, player_position)
-
     # Update the terrain position and draw it
-    level.run(player_position_x, player_position_y)
+    level_map0.run(player_position_x, player_position_y)
+    
+    ## Code pour ajouter la map 1 (solution dupliquer la fonciton pour chaque map)
+    # level_map1.run(player_position_x, player_position_y) 
 
     # Draw the player
     player.draw(window)
