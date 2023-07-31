@@ -55,6 +55,8 @@ class Player(pygame.sprite.Sprite):
         self.hit = True
 
     def move_left(self, vel):
+        if not self.is_in_scroll_x_area[0]:
+            self.x_vel = vel
         self.x_vel = -vel
       
         if self.direction != "left":

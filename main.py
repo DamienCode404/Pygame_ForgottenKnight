@@ -29,8 +29,7 @@ def game(window):
     bg_image = bg_images[0]
     
     # Create the player instance
-    player = Player(FULLSCREEN_WIDTH*1/4, FULLSCREEN_HEIGHT*1/4, 50, 50)
-    
+    player = Player(FULLSCREEN_WIDTH/3, 100, 50, 50)
     
     # Additional blocks
     objects = [*level.terrain_sprites]
@@ -80,7 +79,7 @@ if __name__ == "__game__":
     
 def main_menu():
     while True:
-        window.blit(BG, (0, 0))
+        window.blit(BG_MAIN, (0, 0))
         
         MENU_MOUSE_POS = pygame.mouse.get_pos()
 

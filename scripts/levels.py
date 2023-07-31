@@ -10,6 +10,9 @@ level_0 = {
     'player': 'levels/0/level_0_player.csv',
     'shop': 'levels/0/level_0_shop.csv'}
 
+# level_0 = {
+#     'terrain': 'levels/1/terrain.csv'}
+
 class Level:
     def __init__(self, level_data, surface):
         # general setup
@@ -18,7 +21,7 @@ class Level:
         
         # terrain 
         terrain_layout = import_csv_layout(level_data['terrain'])
-        self.terrain_sprites = self.create_tile_group(terrain_layout, 'terrain', 3)
+        self.terrain_sprites = self.create_tile_group(terrain_layout, 'terrain', 5)
         
         # coins
         # coins_layout = import_csv_layout(level_data['coins'])
