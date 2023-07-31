@@ -38,6 +38,7 @@ class Tile(pygame.sprite.Sprite):
         self.image = pygame.Surface((size, size))
         self.image.fill('grey')
         self.rect = self.image.get_rect(topleft = (x, y))
+        self.mask = pygame.mask.from_surface(self.image)
         
     def update(self, shift):
         self.rect.x += shift
@@ -50,6 +51,7 @@ class StaticTile(Tile):
         self.image = surface
         self.image.set_colorkey((0,0,0))
         self.name = name
+        self.mask = pygame.mask.from_surface(self.image)
 
     def update(self, player_position_x):
         self.rect.x = self.static_x - player_position_x

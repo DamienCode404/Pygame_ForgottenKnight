@@ -27,6 +27,8 @@ class Player(pygame.sprite.Sprite):
         self.attack_count = 0
         self.position_x = 0
         self.animation_cancelable = True
+        self.update_sprite()
+        self.update()
 
     def jump(self):
         self.y_vel = -self.GRAVITY * 8
@@ -126,6 +128,7 @@ class Player(pygame.sprite.Sprite):
             self.animation_cancelable = new_animation_cancelable
             self.sprite_sheet = new_sprite_sheet
             self.animation_count = 0
+            self.update()
 
         sprite_sheet_name = self.sprite_sheet + "_" + self.direction
         sprites = self.SPRITES[sprite_sheet_name]
@@ -137,7 +140,7 @@ class Player(pygame.sprite.Sprite):
             self.attack = False
         elif self.sprite_sheet == "_Attack2" and sprite_index == len(sprites) - 1:
             self.attack = False
-            self.update()
+            #self.update()
 
     def update(self):
         self.rect = self.sprite.get_rect(topleft=(self.rect.x, self.rect.y))

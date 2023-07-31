@@ -28,7 +28,6 @@ class Level:
     def create_tile_group(self, layout, type, resize = 1):
         sprite_group = pygame.sprite.Group()
         resize_offset_y = FULLSCREEN_HEIGHT - (block_size * resize * len(layout))
-        print(resize_offset_y)
 
         for row_index, row in enumerate(layout):
             for col_index, val in enumerate(row):

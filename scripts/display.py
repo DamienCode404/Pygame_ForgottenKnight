@@ -27,7 +27,7 @@ def draw(window, bg_image, player, objects, player_position, bg_images):
     # Draw the player
     player.draw(window)
 
-    pygame.display.update()
+    pygame.display.flip() # was pygame.display.update() before (not sure if it's better or not)
 
 class Button():
 	def __init__(self, image, pos, text_input, font, base_color, hovering_color):

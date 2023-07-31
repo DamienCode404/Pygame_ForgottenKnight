@@ -4,32 +4,54 @@ from scripts.levels import level
 
 def handle_vertical_collision(player, objects, dy):
     
-    collided_objects = []
-    for obj in objects:
-        if pygame.sprite.collide_mask(player, obj):
-            if dy > 0:
-                player.rect.bottom = obj.rect.top
-                player.landed()
-            elif dy < 0:
-                player.rect.top = obj.rect.bottom
-                player.hit_head()
+    # collided_objects = []
+    
+    # for obj in objects:
+    #     if pygame.sprite.collide_mask(player, obj):
+    #         if dy > 0:
+    #             player.rect.bottom = obj.rect.top
+    #             player.landed()
+    #         elif dy < 0:
+    #             player.rect.top = obj.rect.bottom
+    #             player.hit_head()
 
-            collided_objects.append(obj)
+    #         collided_objects.append(obj)
 
-    return collided_objects
+    vertical_collided_objects = []
+    collided_objects = pygame.sprite.spritecollide(player, objects, False, pygame.sprite.collide_mask)
+    if dy > 0 :
+        for collided_object in collided_objects:
+            player.rect.bottom = collided_object.rect.top + 1
+            player.landed()
 
+    elif dy < 0:
+        for collided_object in collided_objects:
+            player.rect.top = collided_object.rect.bottom
+            player.hit_head()
+
+            vertical_collided_objects.append(collided_object)
+
+    return vertical_collided_objects
 
 def collide(player, objects, dx):
-    player.move(dx, 0)
-    player.update()
-    collided_object = None
-    for obj in objects:
-        if pygame.sprite.collide_mask(player, obj):
-            collided_object = obj
-            break
+    player.move(dx * 1.2, -1)
+    #player.update()
+    # old
+    # collided_object = None
+    # To get the first object collided with the player
+    collided_object = pygame.sprite.spritecollideany(player, objects, pygame.sprite.collide_mask)
 
-    player.move(-dx, 0)
-    player.update()
+    # To get all the objects collided with the player
+    #  collided_object = pygame.sprite.spritecollide(player, objects, False, pygame.sprite.collide_mask)
+
+    # old
+    # for obj in objects:
+    #     if pygame.sprite.collide_mask(player, obj):
+    #         collided_object = obj
+    #         break
+
+    player.move(-dx * 1.2, 1)
+    #player.update()
     return collided_object
 
 def handle_move(player, objects):

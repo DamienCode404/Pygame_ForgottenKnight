@@ -56,7 +56,6 @@ def game(window):
                 # Check for space key (jump)
                 if event.key == pygame.K_SPACE and player.jump_count < 2 and player.jump_count > -1:
                     player.jump()
-                    print(player.jump_count)
 
             # Check for mouse clicks
             if event.type == pygame.MOUSEBUTTONDOWN:
