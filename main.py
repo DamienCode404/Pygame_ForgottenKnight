@@ -29,7 +29,7 @@ def game(window):
     bg_image = bg_images[0]
     
     # Create the player instance
-    player = Player(FULLSCREEN_WIDTH/3, 100, 50, 50)
+    player = Player(FULLSCREEN_WIDTH/3, FULLSCREEN_HEIGHT/2, 50, 50)
     
     # Additional blocks
     objects = [*level.terrain_sprites]
