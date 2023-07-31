@@ -1,7 +1,6 @@
 import pygame
 
 from scripts.load_animations import load_sprite_sheets
-from scripts.parameters import FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT, block_size, scroll_area_width, FPS
 from scripts.levels import level
 class Player(pygame.sprite.Sprite):
     # Redimensionner le personnage in game
@@ -25,7 +24,8 @@ class Player(pygame.sprite.Sprite):
         self.hit_count = 0
         self.attack = False
         self.attack_count = 0
-        self.position_x = 0
+        self.position_x = 0 # position x tracking camera position
+        self.position_y = 0 # position y tracking camera position
         self.animation_cancelable = True
         self.update_sprite()
         self.update()
@@ -37,14 +37,16 @@ class Player(pygame.sprite.Sprite):
         self.fall_count = 0
 
     def move(self, dx, dy):
-        #self.rect.x += dx
-
         #Update the player position x value to be able to move the terrain in the opposite direction
         self.position_x += dx
         self.rect.y += dy
 
+        #Update the player position x value to be able to move the terrain in the opposite direction
+        self.position_y += dy
+        self.rect.x += dx
+        
         # Update the terrain position
-        level.terrain_sprites.update(self.position_x)
+        level.terrain_sprites.update(self.position_x, self.position_y)
 
     def attacking(self):
         self.attack = True

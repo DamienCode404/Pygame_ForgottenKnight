@@ -7,13 +7,13 @@ from scripts.parameters import BG, FULLSCREEN_HEIGHT, FULLSCREEN_WIDTH, PLAYER_V
 from scripts.levels import level
 
 
-def draw(window, bg_image, player, objects, player_position, bg_images):
+def draw(window, bg_image, player, objects, player_position_x, player_position_y, bg_images):
     '''
     Draw all the elements on the screen
     '''
     window.blit(bg_image, (0, 0))
 
-    background_paralax_draw(bg_images, player_position)
+    background_paralax_draw(bg_images, player_position_x)
 
     ## Old code to draw the floor blocks (not used anymore)
     ## for obj in objects:
@@ -22,7 +22,7 @@ def draw(window, bg_image, player, objects, player_position, bg_images):
     ##             obj.draw(window, player_position)
 
     # Update the terrain position and draw it
-    level.run(player_position)
+    level.run(player_position_x, player_position_y)
 
     # Draw the player
     player.draw(window)

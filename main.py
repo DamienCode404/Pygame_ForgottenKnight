@@ -67,7 +67,7 @@ def game(window):
         # Update the player physics
         handle_move(player, objects)
         # Draw all the elements
-        draw(window, bg_image, player, objects, player.position_x, bg_images)
+        draw(window, bg_image, player, objects, player.position_x, player.position_y, bg_images)
         clock.tick(FPS)
 
     pygame.quit()

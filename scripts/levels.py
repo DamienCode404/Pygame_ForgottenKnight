@@ -21,7 +21,7 @@ class Level:
         
         # terrain 
         terrain_layout = import_csv_layout(level_data['terrain'])
-        self.terrain_sprites = self.create_tile_group(terrain_layout, 'terrain', 5)
+        self.terrain_sprites = self.create_tile_group(terrain_layout, 'terrain', 4)
         
         # coins
         # coins_layout = import_csv_layout(level_data['coins'])
@@ -53,10 +53,10 @@ class Level:
 
         return sprite_group
                                             
-    def run(self, player_position):
+    def run(self, player_position_x, player_position_y):
         # terrain
 
-        self.terrain_sprites.update(player_position)
+        self.terrain_sprites.update(player_position_x, player_position_y)
         self.terrain_sprites.draw(self.display_surface)
         
         # lamp

@@ -53,6 +53,7 @@ class StaticTile(Tile):
         self.name = name
         self.mask = pygame.mask.from_surface(self.image)
 
-    def update(self, player_position_x):
+    # Camera track player position horizontally and vertically
+    def update(self, player_position_x, player_position_y):
         self.rect.x = self.static_x - player_position_x
-        #self.rect.y = self.static_y - player_position_y
+        self.rect.y = self.static_y - player_position_y
