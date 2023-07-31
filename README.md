@@ -1,10 +1,11 @@
 # Forgotten Knight
 
-## DEMO 
+## Menu 
+![image](https://github.com/DamienCode404/Pygame_ForgottenKnight/assets/116463750/55f460d4-4c93-4cf9-8fd4-5d77d896aa1d)
 
+## In game demo
 
-https://github.com/DamienCode404/Pygame_ForgottenKnight/assets/116463750/3f12d19c-de2f-4bc8-9c79-069984588b10
-
+https://github.com/DamienCode404/Pygame_ForgottenKnight/assets/116463750/b46f732f-26f6-49bd-b0a3-aab93eaffc02
 
 
 This project is a platform game developed with pygame. This will enable me to learn Python in a fun way.
