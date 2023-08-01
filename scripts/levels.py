@@ -69,7 +69,7 @@ level_map1 = Level(level_1, window)
 def get_block(size):
     path = join("assets", "terrain", "oak_woods_tileset.png")
     image = pygame.image.load(path).convert_alpha()
-    surface = pygame.Surface((size, size), pygame.SRCALPHA, 32)
+    surface = pygame.Surface((size, size), pygame.SRCALPHA, 16)
     rect = pygame.Rect(24, 0, size, size)
     surface.blit(image, (0, 0), rect)
     return pygame.transform.scale(surface, (250, 80))
@@ -85,11 +85,3 @@ class Object(pygame.sprite.Sprite):
 
     def draw(self, win, offset_x):
         win.blit(self.image, (self.rect.x - offset_x, self.rect.y))
-
-
-class Block(Object):
-    def __init__(self, x, y, size):
-        super().__init__(x, y, size, size)
-        block = get_block(size)
-        self.image.blit(block, (0, 0))
-        self.mask = pygame.mask.from_surface(self.image)

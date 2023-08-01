@@ -71,5 +71,5 @@ def handle_move(player, objects):
     to_check = [collide_left, collide_right, *vertical_collide]
 
     for obj in to_check:
-        if obj and obj.name == "fire":
+        if obj and obj.name == "damage_src":
             player.make_hit()

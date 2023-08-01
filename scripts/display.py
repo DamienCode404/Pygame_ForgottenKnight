@@ -2,12 +2,11 @@ import pygame
 import sys
 from os.path import join
 
-from scripts.levels import Block
 from scripts.parameters import BG, FULLSCREEN_HEIGHT, FULLSCREEN_WIDTH, PLAYER_VEL, in_game, window
 from scripts.levels import level_map0, level_1
 
 
-def draw(window, bg_image, player, objects, player_position_x, player_position_y, bg_images):
+def draw(window, bg_image, player, player_position_x, player_position_y, bg_images):
     '''
     Draw all the elements on the screen
     '''
